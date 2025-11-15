@@ -3,17 +3,19 @@ require_once __DIR__ . '/includes/auth.php';
 
 $auth = new Auth();
 $error = '';
+$success = '';
 
 if ($_POST) {
+    $name = $_POST['name'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
+    $role = $_POST['role'] ?? 'student';
+    $department = $_POST['department'] ?? '';
     
-    if ($auth->login($email, $password)) {
-        $role = $_SESSION['user_role'];
-        header("Location: dashboard/$role.php");
-        exit();
+    if ($auth->register($name, $email, $password, $role, $department)) {
+        $success = 'Registration successful! You can now login.';
     } else {
-        $error = 'Invalid email or password';
+        $error = 'Registration failed. Email might already exist.';
     }
 }
 ?>
@@ -23,7 +25,7 @@ if ($_POST) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Resource Hub - Login</title>
+    <title>College Resource Hub - Register</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <?php include_once 'includes/chatbot.php'; ?>
@@ -32,9 +34,9 @@ if ($_POST) {
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div class="text-center">
-                <i class="fas fa-graduation-cap text-6xl text-indigo-600 mb-4"></i>
-                <h2 class="text-3xl font-extrabold text-gray-900">College Resource Hub</h2>
-                <p class="mt-2 text-sm text-gray-600">Sign in to access your resources</p>
+                <i class="fas fa-user-plus text-6xl text-indigo-600 mb-4"></i>
+                <h2 class="text-3xl font-extrabold text-gray-900">Create Account</h2>
+                <p class="mt-2 text-sm text-gray-600">Join the College Resource Hub</p>
             </div>
             
             <form class="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-lg" method="POST">
@@ -44,7 +46,19 @@ if ($_POST) {
                     </div>
                 <?php endif; ?>
                 
+                <?php if ($success): ?>
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        <?php echo htmlspecialchars($success); ?>
+                    </div>
+                <?php endif; ?>
+                
                 <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input id="name" name="name" type="text" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                         <input id="email" name="email" type="email" required 
@@ -63,32 +77,44 @@ if ($_POST) {
                             </button>
                         </div>
                     </div>
+                    
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <select id="role" name="role" 
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                        <select id="department" name="department" 
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Select Department</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
                     <button type="submit" 
                             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Sign In
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Register
                     </button>
                 </div>
                 
                 <div class="text-center">
-                    <a href="register.php" class="text-indigo-600 hover:text-indigo-500">
-                        Don't have an account? Register here
+                    <a href="login.php" class="text-indigo-600 hover:text-indigo-500">
+                        Already have an account? Login here
                     </a>
                 </div>
             </form>
-            
-            <!-- Demo Credentials -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-                <h3 class="text-sm font-medium text-yellow-800 mb-2">Demo Credentials:</h3>
-                <div class="text-xs text-yellow-700 space-y-1">
-                    <div><strong>Admin:</strong> admin@college.edu / password</div>
-                    <div><strong>Teacher:</strong> sharma@college.edu / password</div>
-                    <div><strong>Student:</strong> rahul@student.edu / password</div>
-                </div>
-            </div>
         </div>
     </div>
 
